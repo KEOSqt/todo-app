@@ -11,9 +11,13 @@ type FilterType = 'all' | 'active' | 'completed';
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>(() => {
-    const savedTodos = localStorage.getItem('todos');
-    if (savedTodos) {
-      return JSON.parse(savedTodos);
+    try {
+      const savedTodos = localStorage.getItem('todos');
+      if (savedTodos) {
+        return JSON.parse(savedTodos);
+      }
+    } catch {
+      return [];
     }
     return [];
   });
@@ -93,11 +97,23 @@ function App() {
             key={todo.id}
             className={`todo-item ${todo.completed ? 'completed' : ''}`}
           >
-            <div className="todo-content" onClick={() => toggleTodo(todo.id)}>
+            <div
+              className="todo-content"
+              onClick={() => toggleTodo(todo.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleTodo(todo.id);
+                }
+              }}
+            >
               <div className="checkbox" />
               <span>{todo.text}</span>
             </div>
             <button
+              type="button"
               className="delete-btn"
               onClick={() => deleteTodo(todo.id)}
               aria-label="Delete task"
